@@ -37,8 +37,17 @@
             </resource>
         </resources>
 
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.8</version>
+            </extension>
+        </extensions>
+
         <plugins>
             <!-- 打包jar文件时，配置manifest文件，加入lib包的jar依赖 -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -85,27 +94,32 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>wagon-maven-plugin</artifactId>
                 <version>1.0</version>
-                <configuration>
-                    <fromFile>target/wagon-1.0-SNAPSHOT.jar</fromFile>
-                    <url>scp://develop:yrSuper001@192.168.1.249/data/www/remote-service-develop</url>
-                    <commands>
-                        <!--重启服务-->
-                        <command>/data/www/remote-service-develop/wagon.sh restart</command>
-                    </commands>
-                    <!-- 显示运行命令的输出结果 -->
-                    <displayCommandOutputs>true</displayCommandOutputs>
-                </configuration>
+
+                <executions>
+                    <execution>
+                        <id>deploy-to-test</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <fromDir>target</fromDir>
+                            <includes>lib/*,wagon-1.0-SNAPSHOT.jar</includes>
+                            <url>scp://develop:yrSuper001@192.168.1.249</url>
+                            <toDir>data/www/remote-service-develop</toDir>
+                            <commands>
+                                <!--重启服务-->
+                                <!--<command>/data/www/remote-service-develop/wagon.sh start</command>-->
+                            </commands>
+                            <!-- 显示运行命令的输出结果 -->
+                            <displayCommandOutputs>true</displayCommandOutputs>
+                        </configuration>
+                        <goals>
+                            <goal>upload</goal>
+                            <goal>sshexec</goal>
+                        </goals>
+
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
-
-
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
-                <version>2.8</version>
-            </extension>
-        </extensions>
 
         <!--远程服务器相关 end-->
     </build>
