@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/algorithms/algorithms.iml" filepath="$PROJECT_DIR$/algorithms/algorithms.iml" />
       <module fileurl="file://$PROJECT_DIR$/collections.iml" filepath="$PROJECT_DIR$/collections.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wagon/wagon.iml" filepath="$PROJECT_DIR$/wagon/wagon.iml" />
     </modules>
   </component>
 </project>

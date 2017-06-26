@@ -1,0 +1,22 @@
+测试maven的远程打包插件
+
+<build>
+	<extensions>
+		<extension>
+			<groupId>org.apache.maven.wagon</groupId>
+			<artifactId>wagon-ssh</artifactId>
+			<version>2.8</version>
+		</extension>
+	</extensions>
+	<plugins>
+		<plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>wagon-maven-plugin</artifactId>
+			<version>1.0</version>
+			<configuration>
+				<fromFile>target/test.jar</fromFile>
+				<url>scp://user:password@192.168.20.128/home/xxg/Desktop</url>
+			</configuration>
+		</plugin>
+	</plugins>
+</build>
