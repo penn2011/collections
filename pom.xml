@@ -12,6 +12,7 @@
     <modules>
         <module>algorithms</module>
         <module>wagon</module>
+        <module>proxy</module>
     </modules>
     <!-- properties import -->
     <properties>
