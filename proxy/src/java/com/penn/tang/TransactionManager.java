@@ -1,45 +1,48 @@
 package com.penn.tang;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * 模拟事务管理器
  */
-public class TransactionManager   implements DataSourceConecter{
-    DataSourceConecter dataSourceConecter;
+public class TransactionManager implements InvocationHandler {
 
-    public TransactionManager(DataSourceConecter dataSourceConecter) {
-        this.dataSourceConecter = dataSourceConecter;
+    Object service;
+
+
+    public void setDataSourceConecter(Object dataSourceConecter) {
+        this.service = dataSourceConecter;
     }
 
     @Override
-    public Connection getConection() {
-        return dataSourceConecter.getConection();
-    }
+    public Object invoke(Object proxy, Method method, Object[] args) throws InvocationTargetException, IllegalAccessException {
 
+        //有事务标注注解
 
-    @Override
-    public Integer exeUpdateSql(String sql) {
-        //禁用执行提交
-        Connection conection = getConection();
-        try {
-            conection.setAutoCommit(false);
-            Statement statement = conection.createStatement();
-             statement.executeUpdate(sql);
-             //提交事务
-            conection.commit();
-
-        } catch (SQLException e) {
+        if (method.isAnnotationPresent(Transaction.class)) {
+            //执行sql方法应该控制在一个事务里面
+            Connection connection = SQLHelper.getInstance().getCurrentConnection();
             try {
-                //回滚事务
-                conection.rollback();
-            } catch (SQLException e1) {
-                e1.printStackTrace();
+                connection.setAutoCommit(false);
+                Object invoke = method.invoke(service, args);
+                connection.commit();
+                return invoke;
+            } catch (Exception e) {
+                try {
+                    //出现异常回滚事务
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+                return null;
             }
-            e.printStackTrace();
+
         }
-        return null;
+        //其他方法放行
+        return method.invoke(service, args);
     }
 }

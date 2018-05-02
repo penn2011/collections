@@ -17,11 +17,19 @@ public class MysqlConecter implements DataSourceConecter{
 
     private String passwd = "root";
 
+    private ThreadLocal<Connection> connectionThreadLocal = new ThreadLocal<>();
+
     @Override
     public Connection getConection() {
+        if (connectionThreadLocal.get()!=null) {
+            return connectionThreadLocal.get();
+        }
         try {
             Class.forName(driver);
-            return DriverManager.getConnection(url,user,passwd);
+            Connection connection = DriverManager.getConnection(url, user, passwd);
+            //存储当前线程的connection
+            connectionThreadLocal.set(connection);
+            return connection;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -29,9 +37,6 @@ public class MysqlConecter implements DataSourceConecter{
         }
         return null;
     }
-
-
-
 
 
 }
